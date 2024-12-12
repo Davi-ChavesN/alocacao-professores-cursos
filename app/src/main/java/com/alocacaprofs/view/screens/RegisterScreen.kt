@@ -20,20 +20,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.alocacaprofs.controller.Screen
+import com.alocacaprofs.model.Usuario
+import com.alocacaprofs.model.UsuarioDAO
 import com.alocacaprofs.view.components.Botao
 import com.alocacaprofs.view.components.CampoTexto
 import com.alocacaprofs.view.components.CampoTextoSenha
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     navController: NavController
 ) {
+    var nome by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
     var usuario by rememberSaveable { mutableStateOf("") }
     var senha by rememberSaveable { mutableStateOf("") }
 
-    val database = Firebase.firestore
+    val usuarioDAO = UsuarioDAO()
+
+    fun limparCampos() {
+        nome = ""
+        email = ""
+        usuario = ""
+        senha = ""
+    }
 
     Column(
         modifier = Modifier
@@ -42,6 +51,18 @@ fun LoginScreen(
         horizontalAlignment = Alignment
             .CenterHorizontally
     ) {
+        CampoTexto(
+            label = "Nome",
+            value = nome,
+            onValueChange = { nome = it },
+            modifier = Modifier.padding(top = 16.dp)
+        )
+        CampoTexto(
+            label = "Email",
+            value = email,
+            onValueChange = { email = it },
+            modifier = Modifier.padding(top = 16.dp)
+        )
         CampoTexto(
             label = "Usuário",
             value = usuario,
@@ -62,30 +83,35 @@ fun LoginScreen(
             horizontalArrangement = Arrangement
                 .SpaceAround
         ){
-            Botao(texto = "Entrar",
+            Botao(
+                texto = "Registrar",
                 onClick = {
-                    if (!usuario.isBlank() && !senha.isBlank()) {
-                        database.collection("usuario")
-                            .whereEqualTo("usuario", usuario)
-                            .whereEqualTo("senha", senha)
-                            .get()
-                            .addOnSuccessListener { documents ->
-                                if (!documents.isEmpty) {
-                                    navController.navigate(route = Screen.HomeScreen.route)
-                                    Log.i("Login", "Login successful for user: $usuario")
-                                } else {
-                                    Log.i("Login", "Usuário ou senha incorretos")
-                                }
-                            }
-                            .addOnFailureListener { exception ->
-                                Log.e("Login", "Erro ao acessar o Firestore: ${exception.message}")
-                            }
-                    } else {
+                    if(nome.isBlank() || email.isBlank() || usuario.isBlank() || senha.isBlank()) {
                         Log.i("Teste", "Preencha todos os campos")
+                    }else {
+                        var usuario = Usuario("id", nome, email, usuario, senha)
+//                        Log.i("Teste", "Nome: $nome, Email: $email, Usuário: $usuario, Senha: $senha")
+                        usuarioDAO.InputUser(usuario)
+                        limparCampos()
                     }
                 })
-            Botao(texto = "Cadastrar",
-                onClick = { navController.navigate(route = Screen.RegisterScreen.route) })
+            Botao(
+                texto = "Voltar",
+                onClick = {
+                    navController.navigate(Screen.LoginScreen.route) {
+                        popUpTo(Screen.LoginScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                })
         }
     }
 }
+
+
+
+
+
+
+
+
