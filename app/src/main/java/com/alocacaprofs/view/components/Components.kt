@@ -92,3 +92,27 @@ fun CampoTextoSenha(label: String, value: String, onValueChange: (String) -> Uni
         }
     )
 }
+
+@Composable
+fun CampoTextoNumero(label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Decimal
+        )
+    )
+}
+
+@Composable
+fun CampoTextoReadOnly(label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier,
+        readOnly = true
+    )
+}
