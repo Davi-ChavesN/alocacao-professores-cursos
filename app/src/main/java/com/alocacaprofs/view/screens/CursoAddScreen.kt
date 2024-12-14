@@ -1,47 +1,46 @@
 package com.alocacaprofs.view.screens
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.clickable
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ScaffoldState
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.BottomAppBar
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.alocacaprofs.controller.Screen
-import kotlinx.coroutines.CoroutineScope
+import com.alocacaprofs.model.Curso
+import com.alocacaprofs.model.CursoDAO
+import com.alocacaprofs.view.components.Botao
+import com.alocacaprofs.view.components.CampoTexto
+import com.alocacaprofs.view.components.CampoTextoNumero
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun HomeScreen(
+fun CursoAddScreen(
     navController: NavController
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -51,7 +50,7 @@ fun HomeScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Alocação de Professores e Cursos")
+                    Text("Adicionar Curso")
                 },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -100,37 +99,58 @@ fun HomeScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text =
-                """
-                    Informações do Usuário logado
-                """.trimIndent(),
-            )
-        }
-    }
-}
+                .padding(innerPadding)
+                .fillMaxSize()
+                .wrapContentSize(align = Alignment.Center),
+            horizontalAlignment = Alignment
+                .CenterHorizontally
+        ){
+            var nome by rememberSaveable { mutableStateOf("") }
+            var numAlunos by rememberSaveable { mutableStateOf("") }
 
-@Composable
-fun DrawerContent(navController: NavController, scaffoldState: ScaffoldState, scope : CoroutineScope) {
-    val items = listOf("Principal", "Configuracoes", "Cursos")//Nomes usados internamente.
-    Column(modifier = Modifier.padding(16.dp)) {
-        items.forEach { item ->
-            Text(
-                text = item,
+            val cursoDAO = CursoDAO()
+
+            fun limparCampos() {
+                nome = ""
+                numAlunos = ""
+            }
+
+            Text(text = "Adicionar Curso")
+
+            CampoTexto(
+                label = "Nome",
+                value = nome,
+                onValueChange = { nome = it },
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            CampoTextoNumero(
+                label = "Número de Alunos",
+                value = numAlunos,
+                onValueChange = { numAlunos = it },
+                modifier = Modifier.padding(top = 16.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Row (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-                    .clickable {
-                        navController.navigate(item)
-                        scope.launch {
-                            scaffoldState.drawerState.close()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement
+                    .SpaceAround
+            ){
+                Botao(
+                    texto = "Adicionar",
+                    onClick = {
+                        if(nome.isBlank() || numAlunos.isBlank()) {
+                            Log.i("Teste", "Preencha todos os campos")
+                        }else {
+                            var curso = Curso("id", nome, numAlunos.toInt(), List<String>(0, {""}))
+//                        Log.i("Teste", "Nome: $nome, Email: $email, Usuário: $usuario, Senha: $senha")
+                            cursoDAO.InputCurso(curso)
+                            limparCampos()
                         }
-                    }
-            )
+                    })
+            }
         }
     }
 }
