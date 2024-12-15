@@ -220,10 +220,13 @@ fun ProfessorEditScreen (
                 ) {
                     Botao(texto = "Atualizar", onClick = {
                         professorDAO.updateProfessor(professor.value!!)
+                        navController.navigate(Screen.ProfessorListScreen.route){
+                            popUpTo(Screen.CursoListScreen.route) { inclusive = true }
+                        }
                     })
                     Botao(texto = "Deletar", onClick = {
                         professorDAO.deleteProfessor(professor.value!!)
-                        navController.navigate(Screen.CursoListScreen.route){
+                        navController.navigate(Screen.ProfessorListScreen.route){
                             popUpTo(Screen.CursoListScreen.route) { inclusive = true }
                         }
                     })

@@ -199,6 +199,9 @@ fun CursoEditScreen (
                 ) {
                     Botao(texto = "Atualizar", onClick = {
                         cursoDAO.updateCurso(curso.value!!)
+                        navController.navigate(Screen.CursoListScreen.route){
+                            popUpTo(Screen.CursoListScreen.route) { inclusive = true }
+                        }
                     })
                     Botao(texto = "Deletar", onClick = {
                         cursoDAO.deleteCurso(curso.value!!)

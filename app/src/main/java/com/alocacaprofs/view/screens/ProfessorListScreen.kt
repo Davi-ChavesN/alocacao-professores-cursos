@@ -198,13 +198,14 @@ fun calcularTempoServico(dataEntrada: String): String {
     val dias = dataAtual.get(Calendar.DAY_OF_MONTH) - calendarEntrada.get(Calendar.DAY_OF_MONTH)
 
     // Ajusta para o caso de meses ou dias negativos
-    val anosFinais = if (meses < 0 || (meses == 0 && dias < 0)) anos - 1 else anos
-    val mesesFinais = if (meses < 0) 12 + meses else meses
-    val diasFinais = if (dias < 0) {
+    var anosFinais = if (meses < 0 || (meses == 0 && dias < 0)) anos - 1 else anos
+    var mesesFinais = if (meses < 0) 12 + meses else meses
+    var diasFinais = if (dias < 0) {
         val ultimoDiaDoMes = Calendar.getInstance().apply {
             set(calendarEntrada.get(Calendar.YEAR), calendarEntrada.get(Calendar.MONTH), 1)
             add(Calendar.MONTH, 1)
             add(Calendar.DAY_OF_MONTH, -1) // Último dia do mês
+            mesesFinais = mesesFinais-1
         }.getActualMaximum(Calendar.DAY_OF_MONTH)
 
         ultimoDiaDoMes + dias
